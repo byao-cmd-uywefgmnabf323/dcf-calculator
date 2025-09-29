@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Share2, Save, FolderOpen, Upload, X } from 'lucide-react';
+import { Share2, Save, Upload, X } from 'lucide-react';
 import { DcfInputs, SavedScenario } from '@/lib/types';
 import { initialInputs, STORAGE_KEY } from '@/lib/constants';
 import { useDebounce } from '@/lib/utils';
