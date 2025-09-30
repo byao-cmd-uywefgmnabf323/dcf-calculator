@@ -11,6 +11,7 @@ if (!fmpApiKey) {
     console.error('FMP_API_KEY is not set');
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mistral = new (MistralAI as any).default(mistralApiKey || '');
 
 async function getFinancialData(ticker: string) {
