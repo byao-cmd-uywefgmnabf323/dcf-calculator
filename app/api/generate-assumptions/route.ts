@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const MistralClient = require('@mistralai/mistralai');
+
 const mistralApiKey = process.env.MISTRAL_API_KEY;
 const fmpApiKey = process.env.FMP_API_KEY;
 
@@ -10,8 +12,7 @@ if (!fmpApiKey) {
     console.error('FMP_API_KEY is not set');
 }
 
-// @ts-ignore - The module export is not standard, this is the correct way to instantiate.
-const mistral = new MistralClient.default(mistralApiKey || '');
+const mistral = new MistralClient(mistralApiKey || '');
 
 async function getFinancialData(ticker: string) {
     if (!fmpApiKey) return { error: 'FMP API key not configured' };
