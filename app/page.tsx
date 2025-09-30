@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Share2, Save, Upload, X, BookOpen } from 'lucide-react';
+import { Share2, Save, Upload, X, BookOpen, Zap } from 'lucide-react';
 import { DcfInputs, SavedScenario } from '@/lib/types';
 import { initialInputs, STORAGE_KEY } from '@/lib/constants';
 import { useDebounce } from '@/lib/utils';
@@ -9,12 +9,16 @@ import { calculateDcf } from '@/lib/dcf-engine';
 import { Input, Select, Button, Card } from '@/components/ui';
 import { WaccHelperModal } from '@/components/dcf/WaccHelperModal';
 import { ResultsDisplay } from '@/components/dcf/ResultsDisplay';
+import { AssumptionModal } from '@/components/dcf/AssumptionModal';
 
 export default function DcfCalculatorPage() {
   const [inputs, setInputs] = useState<DcfInputs>(initialInputs);
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
   const [isWaccHelperOpen, setWaccHelperOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [isAssumptionModalOpen, setAssumptionModalOpen] = useState(false);
+  const [assumptionData, setAssumptionData] = useState<any>(null);
+  const [isAssumptionLoading, setAssumptionLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -131,6 +135,34 @@ export default function DcfCalculatorPage() {
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleGenerateAssumptions = async () => {
+    setAssumptionModalOpen(true);
+    setAssumptionLoading(true);
+    setAssumptionData(null);
+
+    try {
+      const response = await fetch('/api/generate-assumptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: inputs.ticker }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate assumptions.');
+      }
+
+      const data = await response.json();
+      setAssumptionData(data.assumptions);
+
+    } catch (error) {
+      console.error(error);
+      setNotification('Error generating AI assumptions.');
+      setAssumptionModalOpen(false);
+    } finally {
+      setAssumptionLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(null), 3000);
@@ -177,7 +209,10 @@ export default function DcfCalculatorPage() {
             {inputs.inputMode === 'baseGrowth' ? (
               <>
                 <Input label="Base Free Cash Flow" name="baseFcf" type="number" value={inputs.baseFcf} onChange={handleInputChange} unit="$M" />
-                <Input label="FCF Growth Rate" name="fcfGrowthRate" type="number" value={inputs.fcfGrowthRate} onChange={handleInputChange} unit="%" />
+                <div className='flex items-end gap-2'>
+                  <Input label="FCF Growth Rate" name="fcfGrowthRate" type="number" value={inputs.fcfGrowthRate} onChange={handleInputChange} unit="%" />
+                  <Button variant='secondary' onClick={handleGenerateAssumptions} className='h-10'><Zap size={16} className='mr-1' /> AI</Button>
+                </div>
               </>
             ) : (
               <div className='space-y-2'>
@@ -217,6 +252,14 @@ export default function DcfCalculatorPage() {
         onClose={() => setWaccHelperOpen(false)} 
         onApply={(wacc) => setInputs(p => ({...p, discountRate: parseFloat(wacc.toFixed(2))}))} 
         initialTaxRate={21} // Default, could be an input
+      />
+
+      <AssumptionModal
+        isOpen={isAssumptionModalOpen}
+        onClose={() => setAssumptionModalOpen(false)}
+        onApply={(rate) => setInputs(p => ({...p, fcfGrowthRate: rate}))}
+        assumptions={assumptionData}
+        isLoading={isAssumptionLoading}
       />
 
       {notification && (
