@@ -1,4 +1,4 @@
-const MistralClient = require('@mistralai/mistralai');
+import * as MistralAI from '@mistralai/mistralai';
 import { NextRequest, NextResponse } from 'next/server';
 
 const mistralApiKey = process.env.MISTRAL_API_KEY;
@@ -11,7 +11,7 @@ if (!fmpApiKey) {
     console.error('FMP_API_KEY is not set');
 }
 
-const mistral = new MistralClient(mistralApiKey || '');
+const mistral = new (MistralAI as any).default(mistralApiKey || '');
 
 async function getFinancialData(ticker: string) {
     if (!fmpApiKey) return { error: 'FMP API key not configured' };
@@ -29,8 +29,8 @@ async function getFinancialData(ticker: string) {
         const incomeStatements = await incomeStatementRes.json();
         const analystEstimates = await analystEstimatesRes.json();
 
-        const historicalGrowth = incomeStatements.slice(0, 5).map((is: any) => ({ year: is.calendarYear, revenue: is.revenue, growth: is.revenueGrowth * 100 }));
-        const futureEstimates = analystEstimates.slice(0, 2).map((est: any) => ({ year: est.date.substring(0,4), estimatedRevenueGrowth: est.estimatedRevenueAvg - est.revenue }));
+        const historicalGrowth = incomeStatements.slice(0, 5).map((is: { calendarYear: string; revenue: number; revenueGrowth: number }) => ({ year: is.calendarYear, revenue: is.revenue, growth: is.revenueGrowth * 100 }));
+        const futureEstimates = analystEstimates.slice(0, 2).map((est: { date: string; estimatedRevenueAvg: number; revenue: number }) => ({ year: est.date.substring(0,4), estimatedRevenueGrowth: est.estimatedRevenueAvg - est.revenue }));
 
         return { historicalGrowth, futureEstimates };
 
@@ -88,3 +88,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'An error occurred while generating assumptions.' }, { status: 500 });
   }
 }
+

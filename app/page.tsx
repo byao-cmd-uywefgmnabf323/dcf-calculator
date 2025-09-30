@@ -11,13 +11,19 @@ import { WaccHelperModal } from '@/components/dcf/WaccHelperModal';
 import { ResultsDisplay } from '@/components/dcf/ResultsDisplay';
 import { AssumptionModal } from '@/components/dcf/AssumptionModal';
 
+interface AssumptionData {
+  base: { rate: number; justification: string };
+  bull: { rate: number; justification: string };
+  bear: { rate: number; justification: string };
+}
+
 export default function DcfCalculatorPage() {
   const [inputs, setInputs] = useState<DcfInputs>(initialInputs);
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
   const [isWaccHelperOpen, setWaccHelperOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [isAssumptionModalOpen, setAssumptionModalOpen] = useState(false);
-  const [assumptionData, setAssumptionData] = useState<any>(null);
+  const [assumptionData, setAssumptionData] = useState<AssumptionData | null>(null);
   const [isAssumptionLoading, setAssumptionLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
