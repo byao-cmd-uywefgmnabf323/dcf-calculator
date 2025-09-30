@@ -12,11 +12,4 @@ const compat = new FlatCompat({
 export default [
   { ignores: [".next/**"] },
   ...compat.extends("next/core-web-vitals"),
-  {
-    files: ["app/api/generate-assumptions/route.ts"],
-    rules: {
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-var-requires": "off",
-    },
-  },
 ];
