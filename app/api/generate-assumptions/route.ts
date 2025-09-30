@@ -90,5 +90,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'An error occurred while generating assumptions.' }, { status: 500 });
   }
 }
-
-
