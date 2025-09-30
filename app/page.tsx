@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Share2, Save, Upload, X } from 'lucide-react';
+import { Share2, Save, Upload, X, BookOpen } from 'lucide-react';
 import { DcfInputs, SavedScenario } from '@/lib/types';
 import { initialInputs, STORAGE_KEY } from '@/lib/constants';
 import { useDebounce } from '@/lib/utils';
@@ -145,6 +145,9 @@ export default function DcfCalculatorPage() {
           <div className="flex items-center justify-between h-16">
             <h1 className="text-xl font-bold text-white">DCF Valuation Calculator</h1>
             <div className="flex items-center gap-2">
+              <a href="/learn-dcf">
+                <Button variant="ghost" size="sm"><BookOpen className="w-4 h-4 mr-2" />Learn DCF</Button>
+              </a>
               <Button variant="ghost" size="sm" onClick={handleShare}><Share2 className="w-4 h-4 mr-2" />Share</Button>
               <Button variant="ghost" size="sm" onClick={handleSaveScenario}><Save className="w-4 h-4 mr-2" />Save</Button>
               <Select
