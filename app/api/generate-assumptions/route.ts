@@ -15,8 +15,8 @@ async function getFinancialData(ticker: string) {
 
     try {
         const [incomeStatementRes, analystEstimatesRes] = await Promise.all([
-            fetch(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&apikey=${fmpApiKey}`),
-            fetch(`https://financialmodelingprep.com/api/v3/analyst-estimates/${ticker}?apikey=${fmpApiKey}`)
+            fetch(`https://financialmodelingprep.com/stable/income-statement-growth?symbol=${ticker}&apikey=${fmpApiKey}`),
+            fetch(`https://financialmodelingprep.com/stable/grades-consensus?symbol=${ticker}&apikey=${fmpApiKey}`)
         ]);
 
         if (!incomeStatementRes.ok) {
@@ -31,8 +31,8 @@ async function getFinancialData(ticker: string) {
         const incomeStatements = await incomeStatementRes.json();
         const analystEstimates = await analystEstimatesRes.json();
 
-        const historicalGrowth = incomeStatements.slice(0, 5).map((is: { calendarYear: string; revenue: number; revenueGrowth: number }) => ({ year: is.calendarYear, revenue: is.revenue, growth: is.revenueGrowth * 100 }));
-        const futureEstimates = analystEstimates.slice(0, 2).map((est: { date: string; estimatedRevenueAvg: number; revenue: number }) => ({ year: est.date.substring(0,4), estimatedRevenueGrowth: est.estimatedRevenueAvg - est.revenue }));
+        const historicalGrowth = incomeStatements.slice(0, 5).map((is: { date: string; growthRevenue: number }) => ({ year: is.date.substring(0, 4), growth: is.growthRevenue * 100 }));
+        const futureEstimates = analystEstimates.slice(0, 2).map((est: { consensus: string; }) => ({ consensus: est.consensus }));
 
         return { historicalGrowth, futureEstimates };
 
