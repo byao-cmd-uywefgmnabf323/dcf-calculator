@@ -25,6 +25,8 @@ export default function DcfCalculatorPage() {
   const [isAssumptionModalOpen, setAssumptionModalOpen] = useState(false);
   const [assumptionData, setAssumptionData] = useState<AssumptionData | null>(null);
   const [isAssumptionLoading, setAssumptionLoading] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [isSummaryLoading, setSummaryLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -50,6 +52,13 @@ export default function DcfCalculatorPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const debouncedInputs = useDebounce(inputs, 300);
   const result = useMemo(() => calculateDcf(debouncedInputs), [debouncedInputs]);
@@ -170,12 +179,38 @@ export default function DcfCalculatorPage() {
     }
   };
 
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
-      return () => clearTimeout(timer);
+  const handleGenerateSummary = async () => {
+    if (!result?.intrinsicValuePerShare) {
+      setNotification('Cannot generate summary without a valid valuation.');
+      return;
     }
-  }, [notification]);
+    setSummaryLoading(true);
+    setSummary(null);
+    try {
+      const response = await fetch('/api/generate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          ticker: inputs.ticker,
+          intrinsicValue: result.intrinsicValuePerShare 
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate summary.');
+      }
+
+      const data = await response.json();
+      setSummary(data.summary);
+
+    } catch (error: any) {
+      console.error(error);
+      setNotification(error.message || 'Error generating summary.');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
 
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans">
@@ -252,6 +287,27 @@ export default function DcfCalculatorPage() {
         </div>
 
         <ResultsDisplay result={result} intrinsicValuePerShare={result?.intrinsicValuePerShare ?? 0} />
+
+        {(result || summary) && (
+          <div className='mt-6'>
+            <Card title="AI Valuation Summary">
+              <div className='p-4 space-y-4'>
+                <Button onClick={handleGenerateSummary} disabled={isSummaryLoading || !result?.intrinsicValuePerShare}>
+                  {isSummaryLoading ? 'Generating...' : 'Generate AI Summary'}
+                </Button>
+                {isSummaryLoading && (
+                  <div className="flex items-center justify-center p-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400"></div>
+                  </div>
+                )}
+                {summary && (
+                  <p className='text-gray-300 whitespace-pre-wrap'>{summary}</p>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
+
       </main>
 
       <WaccHelperModal 
