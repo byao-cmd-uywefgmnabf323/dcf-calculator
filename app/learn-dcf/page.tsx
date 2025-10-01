@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ChevronsRight } from 'lucide-react';
+import { Chatbot } from '@/components/dcf/Chatbot';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="mb-12">
@@ -110,6 +111,7 @@ export default function LearnDcfPage() {
           </Link>
         </div>
       </main>
+      <Chatbot />
     </div>
   );
 }
