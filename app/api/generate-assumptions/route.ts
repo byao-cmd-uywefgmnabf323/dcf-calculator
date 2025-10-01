@@ -19,8 +19,13 @@ async function getFinancialData(ticker: string) {
             fetch(`https://financialmodelingprep.com/api/v3/analyst-estimates/${ticker}?apikey=${fmpApiKey}`)
         ]);
 
-        if (!incomeStatementRes.ok || !analystEstimatesRes.ok) {
-            return { error: 'Failed to fetch financial data.' };
+        if (!incomeStatementRes.ok) {
+            const errorText = await incomeStatementRes.text();
+            return { error: `FMP Income Statement API Error: ${incomeStatementRes.status} ${incomeStatementRes.statusText}. Details: ${errorText}` };
+        }
+        if (!analystEstimatesRes.ok) {
+            const errorText = await analystEstimatesRes.text();
+            return { error: `FMP Analyst Estimates API Error: ${analystEstimatesRes.status} ${analystEstimatesRes.statusText}. Details: ${errorText}` };
         }
 
         const incomeStatements = await incomeStatementRes.json();
