@@ -154,15 +154,16 @@ export default function DcfCalculatorPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate assumptions.');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate assumptions.');
       }
 
       const data = await response.json();
       setAssumptionData(data.assumptions);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setNotification('Error generating AI assumptions.');
+      setNotification(error.message || 'Error generating AI assumptions.');
       setAssumptionModalOpen(false);
     } finally {
       setAssumptionLoading(false);
