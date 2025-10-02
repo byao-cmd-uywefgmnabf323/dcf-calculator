@@ -56,8 +56,8 @@ export const Chatbot: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 w-full max-w-md">
-      <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl flex flex-col h-[60vh]">
+    <div className="h-full">
+      <div className="bg-gray-800 border border-gray-700 rounded-xl flex flex-col h-full">
         <div className="p-4 border-b border-gray-700 flex items-center gap-3">
           <Bot className="w-6 h-6 text-indigo-400" />
           <h3 className="text-lg font-bold text-white">DCF Educational Chatbot</h3>

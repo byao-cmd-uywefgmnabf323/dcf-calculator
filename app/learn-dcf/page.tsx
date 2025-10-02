@@ -36,7 +36,8 @@ export default function LearnDcfPage() {
         </div>
       </header>
 
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+      <div className="flex flex-col md:flex-row container mx-auto">
+      <main className="w-full md:w-4/5 p-4 sm:p-6 lg:p-8">
         <Section title="What is a DCF?">
           <p>
             A Discounted Cash Flow (DCF) analysis is a method used to estimate the value of an investment based on its expected future cash flows. Think of it as a way to figure out what a business is worth <strong>today</strong>, based on all the cash it&apos;s predicted to make in the <strong>future</strong>.
@@ -111,7 +112,10 @@ export default function LearnDcfPage() {
           </Link>
         </div>
       </main>
-      <Chatbot />
+      <aside className="w-full md:w-1/5 p-4">
+        <Chatbot />
+      </aside>
+    </div>
     </div>
   );
 }
