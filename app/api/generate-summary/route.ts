@@ -14,7 +14,7 @@ async function getCurrentPrice(ticker: string): Promise<{ price: number; error?:
     if (!fmpApiKey) return { price: 0, error: 'FMP API key not configured' };
 
     try {
-        const response = await fetch(`https://financialmodelingprep.com/stable/quote-short/${ticker}?apikey=${fmpApiKey}`);
+        const response = await fetch(`https://financialmodelingprep.com/stable/quote-short?symbol=${ticker}&apikey=${fmpApiKey}`);
         if (!response.ok) {
             const errorText = await response.text();
             return { price: 0, error: `FMP Quote API Error: ${response.status} ${response.statusText}. Details: ${errorText}` };
